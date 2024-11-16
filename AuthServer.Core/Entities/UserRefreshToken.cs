@@ -1,3 +1,5 @@
+using AuthServer.Core.Dtos;
+
 namespace AuthServer.Core.Entities;
 
 public class UserRefreshToken
