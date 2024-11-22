@@ -1,9 +1,14 @@
 using AuthServer.API.TokenConfiguration;
+using AuthServer.Core.Configuration.TokenConfiguration;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.Configure<CustomTokenOption>(builder.Configuration.GetSection("TokenOptions"));
 // appSetting.json içindeki veriler ile CustomTokenOption prop'larını eşleştirdik.
+
+builder.Services.AddSingleton<ICustomTokenOption>(sp =>
+    sp.GetRequiredService<IOptions<CustomTokenOption>>().Value);
 
 // Add services to the container.
 

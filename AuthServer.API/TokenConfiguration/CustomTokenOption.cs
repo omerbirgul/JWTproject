@@ -1,10 +1,12 @@
+using AuthServer.Core.Configuration.TokenConfiguration;
+
 namespace AuthServer.API.TokenConfiguration;
 
-public class CustomTokenOption
+public class CustomTokenOption : ICustomTokenOption
 {
-    public List<String> Audience { get; set; }
-    public string Issuer { get; set; }
-    public int AccessTokenExpiration { get; set; }
-    public int RefreshTokenExpiration { get; set; }
-    public string SecurityKey { get; set; }
+    public List<string> Audience { get; }
+    public string Issuer { get; }
+    public int AccessTokenExpiration { get; }
+    public int RefreshTokenExpiration { get; }
+    public string SecurityKey { get; }
 }
