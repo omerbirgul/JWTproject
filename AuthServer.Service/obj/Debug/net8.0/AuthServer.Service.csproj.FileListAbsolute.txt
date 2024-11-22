@@ -1,0 +1,6 @@
+D:\Github\JWTproject\AuthServer.Service\obj\Debug\net8.0\AuthServer.Service.csproj.AssemblyReference.cache
+D:\Github\JWTproject\AuthServer.Service\obj\Debug\net8.0\AuthServer.Service.GeneratedMSBuildEditorConfig.editorconfig
+D:\Github\JWTproject\AuthServer.Service\obj\Debug\net8.0\AuthServer.Service.AssemblyInfoInputs.cache
+D:\Github\JWTproject\AuthServer.Service\obj\Debug\net8.0\AuthServer.Service.AssemblyInfo.cs
+D:\Github\JWTproject\AuthServer.Service\obj\Debug\net8.0\AuthServer.Service.csproj.CoreCompileInputs.cache
+D:\Github\JWTproject\AuthServer.Service\obj\Debug\net8.0\AuthServer.Service.sourcelink.json
