@@ -29,7 +29,7 @@ public class TokenService : ITokenService
         return Convert.ToBase64String(numberBytes);
     }
 
-    private IEnumerable<Claim> GetClaim(UserApp userApp, List<string> audiences)
+    private IEnumerable<Claim> GetClaims(UserApp userApp, List<string> audiences)
     {
         var userList = new List<Claim>()
         {
@@ -38,11 +38,24 @@ public class TokenService : ITokenService
             new Claim(ClaimTypes.Name, userApp.UserName),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
-        var value = audiences.Select(x => new Claim(JwtRegisteredClaimNames.Aud, x));
+        var value = audiences
+            .Select(x => new Claim(JwtRegisteredClaimNames.Aud, x));
         // her bir audience değeri üzerinden geçilir ve her bir öğe için yeni bir Claim oluşturulur ve kullanıcın hedef kitlesi yeni claime atanır.
         
         userList.AddRange(value);
-        return userList;
+        return userList; 
+    }
+
+    private IEnumerable<Claim> GetClaimsByClient(Client client)
+    {
+        var claims = new List<Claim>();
+        claims.AddRange(client.Audiences
+            .Select(x => new Claim(JwtRegisteredClaimNames.Aud, x)));
+
+        claims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
+        claims.Add(new Claim(JwtRegisteredClaimNames.Sub, client.Id.ToString()));
+
+        return claims;
     }
 
     
