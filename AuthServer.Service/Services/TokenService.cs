@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using AuthServer.Core.Configuration;
@@ -6,7 +7,8 @@ using AuthServer.Core.Dtos;
 using AuthServer.Core.Entities;
 using AuthServer.Core.Services.Abstract;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Tokens;
+using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
 namespace AuthServer.Service.Services;
 
@@ -61,7 +63,40 @@ public class TokenService : ITokenService
     
     public TokenDto CreateToken(UserApp userApp)
     {
-        throw new NotImplementedException();
+        var accessTokenExpiration = DateTime.Now
+            .AddMinutes(_customTokenOption.AccessTokenExpiration);
+        // Access Token expire olma süresi
+
+        var refreshTokenExpiration = DateTime.Now
+            .AddMinutes(_customTokenOption.RefreshTokenExpiration);
+        // Refresh Token expire olma süresi.
+
+        var securityKey = SignService.GetSymmetricSecurityKey(_customTokenOption.SecurityKey);
+        // Token'ı imzalayacak olan key
+
+        SigningCredentials signingCredentials =
+            new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
+
+        JwtSecurityToken jwtSecurityToken = new JwtSecurityToken(
+            issuer: _customTokenOption.Issuer,
+            expires: accessTokenExpiration,
+            notBefore: DateTime.Now,
+            claims: GetClaims(userApp, _customTokenOption.Audience),
+            signingCredentials: signingCredentials);
+
+        var handler = new JwtSecurityTokenHandler(); 
+        // Token'ı oluşturacak.
+
+        var token = handler.WriteToken(jwtSecurityToken);
+        var tokenDto = new TokenDto()
+        {
+            AccessToken = token,
+            RefreshToken = CreateRefreshToken(),
+            AccessTokenExpiration = accessTokenExpiration,
+            RefreshTokenExpiration = refreshTokenExpiration
+        };
+
+        return tokenDto;
     }
 
     public ClientTokenDto CreateTokenByClient(Client client)
