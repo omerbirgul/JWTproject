@@ -63,6 +63,19 @@ public class AuthenticationService : IAuthenticationService
         await _unitOfWork.SaveChangesAsync();
         return ResponseDto<TokenDto>.Success(token, 200);
     }
+    
+    
+    public ResponseDto<ClientTokenDto> CreateTokenByClient(ClientLoginDto clientLoginDto)
+    {
+        var client = _clients
+            .SingleOrDefault(x => x.Id == clientLoginDto.ClientId && x.Secret == clientLoginDto.ClientSecret);
+
+        if (client == null) return ResponseDto<ClientTokenDto>
+            .Fail("ClientId or ClientSecret not found!", 404, true);
+
+        var token = _tokenService.CreateTokenByClient(client);
+        return ResponseDto<ClientTokenDto>.Success(token, 200);
+    }
 
     public Task<ResponseDto<TokenDto>> CreateTokenByRefreshToken(string refreshToken)
     {
@@ -70,11 +83,6 @@ public class AuthenticationService : IAuthenticationService
     }
 
     public Task<ResponseDto<NoDataDto>> RevokeRefreshTokenAsync(string refreshToken)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<ResponseDto<ClientTokenDto>> CreateTokenByClient(ClientLoginDto clientLoginDto)
     {
         throw new NotImplementedException();
     }
