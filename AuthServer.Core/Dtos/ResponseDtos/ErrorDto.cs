@@ -1,4 +1,4 @@
-namespace AuthServer.Core.Dtos;
+namespace AuthServer.Core.Dtos.ResponseDtos;
 
 public class ErrorDto
 {
