@@ -12,13 +12,6 @@ public class UnitOfWork : IUnitOfWork
         _context = context;
     }
 
-    public async Task SaveChangesAsync()
-    {
-        await _context.SaveChangesAsync();
-    }
-
-    public void SaveChanges()
-    {
-        _context.SaveChanges();
-    }
+    public async Task SaveChangesAsync() => await _context.SaveChangesAsync();
+    public void SaveChanges() => _context.SaveChanges();
 }
