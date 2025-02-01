@@ -7,6 +7,7 @@ using AuthServer.Core.Dtos;
 using AuthServer.Core.Entities;
 using AuthServer.Core.Services.Abstract;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
@@ -15,12 +16,12 @@ namespace AuthServer.Service.Services;
 public class TokenService : ITokenService
 {
     private readonly UserManager<UserApp> _userManager;
-    private readonly ICustomTokenOption _customTokenOption;
+    private readonly CustomTokenOption _customTokenOption;
 
-    public TokenService(UserManager<UserApp> userManager, ICustomTokenOption customTokenOption)
+    public TokenService(UserManager<UserApp> userManager, IOptions<CustomTokenOption> options)
     {
         _userManager = userManager;
-        _customTokenOption = customTokenOption;
+        _customTokenOption = options.Value;
     }
 
     private string CreateRefreshToken()

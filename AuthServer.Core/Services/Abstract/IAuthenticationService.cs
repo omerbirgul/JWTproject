@@ -1,4 +1,3 @@
-using AuthServer.Core.Configuration;
 using AuthServer.Core.Dtos;
 using AuthServer.Core.Dtos.LoginDtos;
 using AuthServer.Core.Dtos.ResponseDtos;

@@ -9,10 +9,10 @@ public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEnt
     private readonly DbContext _context;
     private readonly DbSet<TEntity> _dbSet;
 
-    public GenericRepository(AppDbContext context, DbSet<TEntity> dbSet)
+    public GenericRepository(AppDbContext context)
     {
-        _dbSet = dbSet;
         _context = context;
+        _dbSet = context.Set<TEntity>();
     }
 
     public async Task<TEntity> GetByIdAsync(int id)

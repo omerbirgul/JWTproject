@@ -1,5 +1,4 @@
 using System.Linq.Expressions;
-using AuthServer.Core.Dtos;
 using AuthServer.Core.Dtos.ResponseDtos;
 
 namespace AuthServer.Core.Services.Abstract;
