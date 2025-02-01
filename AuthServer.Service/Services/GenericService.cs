@@ -1,5 +1,7 @@
 using System.Linq.Expressions;
+using System.Net;
 using AuthServer.Core.Dtos;
+using AuthServer.Core.Dtos.ResponseDtos;
 using AuthServer.Core.Repositories;
 using AuthServer.Core.Services.Abstract;
 using AuthServer.Core.UnitOfWork;
@@ -21,30 +23,30 @@ public class GenericService<TEntity, TDto> : IGenericService<TEntity, TDto> wher
 
     public async Task<ResponseDto<TDto>> GetByIdAsync(int id)
     {
-        var product = await _genericRepository.GetByIdAsync(id);
-        if (product == null)
+        var entity = await _genericRepository.GetByIdAsync(id);
+        if (entity is null)
         {
-            var failerResponseMessage = ResponseDto<TDto>.Fail("Id not found", 404, true);
+            var failerResponseMessage = ResponseDto<TDto>.Fail("entity cannot found");
         }
 
-        var productDto = ObjectMapper.Mapper.Map<TDto>(product);
-        var responseMessage = ResponseDto<TDto>.Success(productDto, 200);
+        var entityDto = ObjectMapper.Mapper.Map<TDto>(entity);
+        var responseMessage = ResponseDto<TDto>.Success(entityDto);
         return responseMessage;
     }
 
     public async Task<ResponseDto<IEnumerable<TDto>>> GetAllAsync()
     {
-        var productsFromRepository = await _genericRepository.GetAllAsync();
-        var productList = ObjectMapper.Mapper.Map<List<TDto>>(productsFromRepository);
-        var responseMessage = ResponseDto<IEnumerable<TDto>>.Success(productList, 200);
+        var entities = await _genericRepository.GetAllAsync();
+        var entityDtoList = ObjectMapper.Mapper.Map<List<TDto>>(entities);
+        var responseMessage = ResponseDto<IEnumerable<TDto>>.Success(entityDtoList);
         return responseMessage;
     }
 
     public async Task<ResponseDto<IEnumerable<TDto>>> Where(Expression<Func<TEntity, bool>> predicate)
     {
-        var list = _genericRepository.Where(predicate);
-        var mappedObject = ObjectMapper.Mapper.Map<IEnumerable<TDto>>(await list.ToListAsync());
-        var responseMessage = ResponseDto<IEnumerable<TDto>>.Success(mappedObject, 200);
+        var list = await _genericRepository.Where(predicate).ToListAsync();
+        var mappedObject = ObjectMapper.Mapper.Map<IEnumerable<TDto>>(list);
+        var responseMessage = ResponseDto<IEnumerable<TDto>>.Success(mappedObject);
         return responseMessage;
     }
 
@@ -55,37 +57,37 @@ public class GenericService<TEntity, TDto> : IGenericService<TEntity, TDto> wher
         await _unitOfWork.SaveChangesAsync();
 
         var newDto = ObjectMapper.Mapper.Map<TDto>(newEntity);
-        var responseMessage = ResponseDto<TDto>.Success(newDto, 200);
+        var responseMessage = ResponseDto<TDto>.Success(newDto, HttpStatusCode.Created);
         return responseMessage;
     }
 
     public async Task<ResponseDto<NoDataDto>> Remove(int id)
     {
         var isExist = await _genericRepository.GetByIdAsync(id);
-        if (isExist == null)
+        if (isExist is null)
         {
-            var failerResponseMessage = ResponseDto<NoDataDto>.Fail("Id not found", 404, true);
+            var failerResponseMessage = ResponseDto<NoDataDto>.Fail("Id not found");
             return failerResponseMessage;
         }
         _genericRepository.Remove(isExist);
         await _unitOfWork.SaveChangesAsync();
-        var responseMessage = ResponseDto<NoDataDto>.Success(204);
+        var responseMessage = ResponseDto<NoDataDto>.Success(default, HttpStatusCode.NoContent);
         return responseMessage;
     }
 
     public async Task<ResponseDto<NoDataDto>> Update(TDto tDto, int id)
     {
         var isExist = await _genericRepository.GetByIdAsync(id);
-        if (isExist == null)
+        if (isExist is null)
         {
-            var failerResponseMessage = ResponseDto<NoDataDto>.Fail("Id not found", 404, true);
+            var failerResponseMessage = ResponseDto<NoDataDto>.Fail("Id not found", HttpStatusCode.NoContent);
             return failerResponseMessage;
         }
 
         var entity = ObjectMapper.Mapper.Map<TEntity>(tDto);
         _genericRepository.Update(entity);
         await _unitOfWork.SaveChangesAsync();
-        var responseMessage = ResponseDto<NoDataDto>.Success(204);
+        var responseMessage = ResponseDto<NoDataDto>.Success(default, HttpStatusCode.NoContent);
         return responseMessage;
     }
 }

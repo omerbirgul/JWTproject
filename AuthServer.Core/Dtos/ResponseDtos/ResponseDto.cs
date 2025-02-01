@@ -18,6 +18,11 @@ public class ResponseDto<T> where T : class
         return new ResponseDto<T>() { Data = data, StatusCode = statusCode};
     }
 
+    public static ResponseDto<T> Success(HttpStatusCode statusCode = HttpStatusCode.OK)
+    {
+        return new ResponseDto<T>() {StatusCode = statusCode};
+    }
+
     public static ResponseDto<T> SuccessAsCreated(T data, string urlAsCreated)
     {
         return new ResponseDto<T>() { Data = data, StatusCode = HttpStatusCode.Created, UrlAsCreated = urlAsCreated};
@@ -28,9 +33,9 @@ public class ResponseDto<T> where T : class
         return new ResponseDto<T>() { Error = errorDto, StatusCode = statusCode};
     }
 
-    public static ResponseDto<T> Fail(string errorMessage, bool isShow, HttpStatusCode statusCode = HttpStatusCode.BadRequest)
+    public static ResponseDto<T> Fail(string errorMessage, HttpStatusCode statusCode = HttpStatusCode.BadRequest)
     {
-        var errorDto = new ErrorDto(errorMessage, isShow);
+        var errorDto = new ErrorDto(errorMessage, true);
         return new ResponseDto<T>() { Error = errorDto, StatusCode = statusCode};
     }
 }

@@ -1,5 +1,8 @@
+using System.Net;
 using AuthServer.Core.Configuration;
 using AuthServer.Core.Dtos;
+using AuthServer.Core.Dtos.LoginDtos;
+using AuthServer.Core.Dtos.ResponseDtos;
 using AuthServer.Core.Entities;
 using AuthServer.Core.Repositories;
 using AuthServer.Core.Services.Abstract;
@@ -32,13 +35,13 @@ public class AuthenticationService : IAuthenticationService
     
     public async Task<ResponseDto<TokenDto>> CreateTokenAsync(LoginDto loginDto)
     {
-        if (loginDto is null) throw new ArgumentException(nameof(loginDto));
+        if (loginDto is null) return ResponseDto<TokenDto>.Fail("some errors occurs");
 
         var user = await _userManager.FindByEmailAsync(loginDto.Email);
-        if (user is null) return ResponseDto<TokenDto>.Fail("Email or Password wrong!", 400, true);
+        if (user is null) return ResponseDto<TokenDto>.Fail("Email or Password wrong!");
 
         bool isPasswordCorrect = await _userManager.CheckPasswordAsync(user, loginDto.Password);
-        if(!isPasswordCorrect) return ResponseDto<TokenDto>.Fail("Email or Password wrong!", 400, true);
+        if(!isPasswordCorrect) return ResponseDto<TokenDto>.Fail("Email or Password wrong!");
 
         var token = _tokenService.CreateToken(user);
         var userRefreshToken = await _userRefreshTokenRepository
@@ -61,7 +64,7 @@ public class AuthenticationService : IAuthenticationService
         }
 
         await _unitOfWork.SaveChangesAsync();
-        return ResponseDto<TokenDto>.Success(token, 200);
+        return ResponseDto<TokenDto>.Success(token);
     }
     
     
@@ -70,11 +73,10 @@ public class AuthenticationService : IAuthenticationService
         var client = _clients
             .SingleOrDefault(x => x.Id == clientLoginDto.ClientId && x.Secret == clientLoginDto.ClientSecret);
 
-        if (client == null) return ResponseDto<ClientTokenDto>
-            .Fail("ClientId or ClientSecret not found!", 404, true);
+        if (client is null) return ResponseDto<ClientTokenDto>.Fail("ClientId or ClientSecret not found!");
 
         var token = _tokenService.CreateTokenByClient(client);
-        return ResponseDto<ClientTokenDto>.Success(token, 200);
+        return ResponseDto<ClientTokenDto>.Success(token);
     }
 
     public async Task<ResponseDto<TokenDto>> CreateTokenByRefreshToken(string refreshToken)
@@ -82,17 +84,17 @@ public class AuthenticationService : IAuthenticationService
         var existRefreshToken = await _userRefreshTokenRepository
             .Where(x => x.Code == refreshToken).SingleOrDefaultAsync();
 
-        if (existRefreshToken is null) ResponseDto<TokenDto>.Fail("Refresh token not found!", 404, true);
+        if (existRefreshToken is null) ResponseDto<TokenDto>.Fail("Refresh token not found!");
 
         var user = await _userManager.FindByIdAsync(existRefreshToken.UserId);
-        if (user is null) return ResponseDto<TokenDto>.Fail("UserId not found!", 404, true);
+        if (user is null) return ResponseDto<TokenDto>.Fail("UserId not found!");
 
         var tokenDto = _tokenService.CreateToken(user);
         existRefreshToken.Code = tokenDto.RefreshToken;
         existRefreshToken.ExpirationDate = tokenDto.RefreshTokenExpiration;
 
         await _unitOfWork.SaveChangesAsync();
-        return ResponseDto<TokenDto>.Success(tokenDto, 200);
+        return ResponseDto<TokenDto>.Success(tokenDto);
     }
 
     public async Task<ResponseDto<NoDataDto>> RevokeRefreshTokenAsync(string refreshToken)
@@ -100,11 +102,10 @@ public class AuthenticationService : IAuthenticationService
         var existRefreshToken = await _userRefreshTokenRepository
             .Where(x => x.Code == refreshToken).SingleOrDefaultAsync();
 
-        if (existRefreshToken is null) 
-            return ResponseDto<NoDataDto>.Fail("Refresh token not found", 404, true);
+        if (existRefreshToken is null) return ResponseDto<NoDataDto>.Fail("Refresh token not found");
         
         _userRefreshTokenRepository.Remove(existRefreshToken);
         await _unitOfWork.SaveChangesAsync();
-        return ResponseDto<NoDataDto>.Success(200);
+        return ResponseDto<NoDataDto>.Success();
     }
 }

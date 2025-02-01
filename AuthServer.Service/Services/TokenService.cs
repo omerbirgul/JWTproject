@@ -33,7 +33,7 @@ public class TokenService : ITokenService
 
     private IEnumerable<Claim> GetClaims(UserApp userApp, List<string> audiences)
     {
-        var userList = new List<Claim>()
+        var userClaimList = new List<Claim>()
         {
             new Claim(ClaimTypes.NameIdentifier, userApp.Id),
             new Claim(JwtRegisteredClaimNames.Email, userApp.Email),
@@ -44,8 +44,8 @@ public class TokenService : ITokenService
             .Select(x => new Claim(JwtRegisteredClaimNames.Aud, x));
         // her bir audience değeri üzerinden geçilir ve her bir öğe için yeni bir Claim oluşturulur ve kullanıcın hedef kitlesi yeni claime atanır.
         
-        userList.AddRange(value);
-        return userList; 
+        userClaimList.AddRange(value);
+        return userClaimList; 
     }
 
     private IEnumerable<Claim> GetClaimsByClient(Client client)
