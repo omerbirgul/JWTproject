@@ -71,7 +71,7 @@ public class GenericService<TEntity, TDto> : IGenericService<TEntity, TDto> wher
         }
         _genericRepository.Remove(isExist);
         await _unitOfWork.SaveChangesAsync();
-        var responseMessage = ResponseDto<NoDataDto>.Success(default, HttpStatusCode.NoContent);
+        var responseMessage = ResponseDto<NoDataDto>.Success();
         return responseMessage;
     }
 
@@ -87,7 +87,7 @@ public class GenericService<TEntity, TDto> : IGenericService<TEntity, TDto> wher
         var entity = ObjectMapper.Mapper.Map<TEntity>(tDto);
         _genericRepository.Update(entity);
         await _unitOfWork.SaveChangesAsync();
-        var responseMessage = ResponseDto<NoDataDto>.Success(default, HttpStatusCode.NoContent);
+        var responseMessage = ResponseDto<NoDataDto>.Success();
         return responseMessage;
     }
 }

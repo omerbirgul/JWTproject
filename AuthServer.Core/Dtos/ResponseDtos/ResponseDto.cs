@@ -18,7 +18,7 @@ public class ResponseDto<T> where T : class
         return new ResponseDto<T>() { Data = data, StatusCode = statusCode};
     }
 
-    public static ResponseDto<T> Success(HttpStatusCode statusCode = HttpStatusCode.OK)
+    public static ResponseDto<T> Success(HttpStatusCode statusCode = HttpStatusCode.NoContent)
     {
         return new ResponseDto<T>() {StatusCode = statusCode};
     }
