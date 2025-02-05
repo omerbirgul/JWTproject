@@ -15,12 +15,10 @@ namespace AuthServer.Service.Services;
 
 public class TokenService : ITokenService
 {
-    private readonly UserManager<UserApp> _userManager;
     private readonly CustomTokenOption _customTokenOption;
 
-    public TokenService(UserManager<UserApp> userManager, IOptions<CustomTokenOption> options)
+    public TokenService(IOptions<CustomTokenOption> options)
     {
-        _userManager = userManager;
         _customTokenOption = options.Value;
     }
 

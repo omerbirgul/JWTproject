@@ -1,7 +1,16 @@
 using AuthServer.API.Extensions;
 using AuthServer.Core.Configuration;
 using AuthServer.Core.Configuration.TokenConfiguration;
+using AuthServer.Core.Entities;
+using AuthServer.Core.Repositories;
+using AuthServer.Core.Services.Abstract;
+using AuthServer.Core.UnitOfWork;
 using AuthServer.Service.Extensions;
+using AuthServer.Service.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,13 +23,34 @@ builder.Services.Configure<List<Client>>(builder.Configuration.GetSection("Clien
 
 
 
-
-
 // DbContext ekleme işlemi
 builder.Services.AddDatabase(builder.Configuration);
 
 // Identity ve JWT ekleme işlemi
 builder.Services.AddSecurity(builder.Configuration);
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, opts =>
+{
+    var tokenOptions = builder.Services.BuildServiceProvider()
+        .GetRequiredService<IOptions<CustomTokenOption>>().Value;
+    opts.TokenValidationParameters = new TokenValidationParameters()
+    {
+        
+        ValidIssuer = tokenOptions.Issuer,
+        ValidAudience = tokenOptions.Audience[0],
+        IssuerSigningKey = SignService.GetSymmetricSecurityKey(tokenOptions.SecurityKey),
+
+        ValidateIssuerSigningKey = true,
+        ValidateAudience = true,
+        ValidateIssuer = true,
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.Zero
+    };
+});
 
 // DI Registers
 builder.Services.AddServices(builder.Configuration);
@@ -40,6 +70,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

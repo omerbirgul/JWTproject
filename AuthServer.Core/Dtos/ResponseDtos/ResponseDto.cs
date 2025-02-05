@@ -35,7 +35,7 @@ public class ResponseDto<T> where T : class
 
     public static ResponseDto<T> Fail(string errorMessage, HttpStatusCode statusCode = HttpStatusCode.BadRequest)
     {
-        var errorDto = new ErrorDto(errorMessage, true);
+        var errorDto = new ErrorDto(errorMessage);
         return new ResponseDto<T>() { Error = errorDto, StatusCode = statusCode};
     }
 }

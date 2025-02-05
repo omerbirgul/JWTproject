@@ -35,13 +35,16 @@ public class AuthenticationService : IAuthenticationService
     
     public async Task<ResponseDto<TokenDto>> CreateTokenAsync(LoginDto loginDto)
     {
-        if (loginDto is null) return ResponseDto<TokenDto>.Fail("some errors occurs");
+        if (loginDto is null) 
+            return ResponseDto<TokenDto>.Fail("some errors occurs");
 
         var user = await _userManager.FindByEmailAsync(loginDto.Email);
-        if (user is null) return ResponseDto<TokenDto>.Fail("Email or Password wrong!");
-
         bool isPasswordCorrect = await _userManager.CheckPasswordAsync(user, loginDto.Password);
-        if(!isPasswordCorrect) return ResponseDto<TokenDto>.Fail("Email or Password wrong!");
+        if (user is null || !isPasswordCorrect)
+        {
+            return ResponseDto<TokenDto>.Fail("Email or Password is incorrect");
+        }
+
 
         var token = _tokenService.CreateToken(user);
         var userRefreshToken = await _userRefreshTokenRepository

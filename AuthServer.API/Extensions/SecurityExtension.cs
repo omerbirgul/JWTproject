@@ -19,28 +19,27 @@ namespace AuthServer.API.Extensions
             }).AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
 
 
-
-            services.AddAuthentication(opt =>
-            {
-                opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, opt2 =>
-            {
-                var tokenOptions = configuration.GetSection("TokenOptions").Get<CustomTokenOption>();
-
-                opt2.TokenValidationParameters = new TokenValidationParameters()
-                {
-                    ValidIssuer = tokenOptions.Issuer,
-                    ValidAudience = tokenOptions.Audience[0],
-                    IssuerSigningKey = SignService.GetSymmetricSecurityKey(tokenOptions.SecurityKey),
-
-                    ValidateIssuerSigningKey = true,
-                    ValidateAudience = true,
-                    ValidateIssuer = true,
-                    ValidateLifetime = true,
-                    ClockSkew = TimeSpan.Zero
-                };
-            });
+            // services.AddAuthentication(options =>
+            // {
+            //     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            //     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            // }).AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, opts =>
+            // {
+            //     var tokenOptions = configuration.GetSection("TokenOptions").Get<CustomTokenOption>();
+            //     if (tokenOptions is null) throw new Exception("tokenOption is null");
+            //     opts.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
+            //     {
+            //         ValidIssuer = tokenOptions.Issuer,
+            //         ValidAudience = tokenOptions.Audience[0],
+            //         IssuerSigningKey = SignService.GetSymmetricSecurityKey(tokenOptions.SecurityKey),
+            //
+            //         ValidateIssuerSigningKey = true,
+            //         ValidateAudience = true,
+            //         ValidateIssuer = true,
+            //         ValidateLifetime = true,
+            //         ClockSkew = TimeSpan.Zero
+            //     };
+            // });
         }
     }
 }

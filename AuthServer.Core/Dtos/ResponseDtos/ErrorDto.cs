@@ -2,24 +2,18 @@ namespace AuthServer.Core.Dtos.ResponseDtos;
 
 public class ErrorDto
 {
-    public List<String> Errors { get; private set; }
-    public bool IsShow { get; private set; }
+    public List<String> Errors { get;  private set; } = new();
 
 
-    public ErrorDto()
+    public ErrorDto(){}
+
+    public ErrorDto(string error)
     {
-        Errors = new List<string>();
+        Errors.Add(error);
     }
 
-    public ErrorDto(string errors, bool isShow)
+    public ErrorDto(List<string> errors)
     {
-        Errors.Add(errors);
-        IsShow = isShow;
-    }
-
-    public ErrorDto(List<string> errors, bool isIsShow)
-    {
-        Errors = errors;
-        IsShow = isIsShow;
+        Errors = errors ?? new List<string>();
     }
 }

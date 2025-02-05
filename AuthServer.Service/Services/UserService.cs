@@ -28,10 +28,11 @@ public class UserService : IUserService
         };
 
         var identityResult = await _userManager.CreateAsync(user, createUserDto.Password);
+        if (identityResult is null) return ResponseDto<UserAppDto>.Fail("user cannot added");
         if (!identityResult.Succeeded)
         {
             var errors = identityResult.Errors.Select(x => x.Description).ToList();
-            return ResponseDto<UserAppDto>.Fail(new ErrorDto(errors, true));
+            return ResponseDto<UserAppDto>.Fail(new ErrorDto(errors));
         }
 
         var userDto = ObjectMapper.Mapper.Map<UserAppDto>(user);

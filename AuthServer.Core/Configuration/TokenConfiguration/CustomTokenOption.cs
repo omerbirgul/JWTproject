@@ -2,9 +2,11 @@ namespace AuthServer.Core.Configuration.TokenConfiguration;
 
 public class CustomTokenOption
 {
-    public List<string> Audience { get; }
-    public string Issuer { get; }
-    public int AccessTokenExpiration { get; }
-    public int RefreshTokenExpiration { get; }
-    public string SecurityKey { get; }
+    public List<String> Audience { get; set; }
+    public string Issuer { get; set; }
+
+    public int AccessTokenExpiration { get; set; }
+    public int RefreshTokenExpiration { get; set; }
+
+    public string SecurityKey { get; set; }
 }
