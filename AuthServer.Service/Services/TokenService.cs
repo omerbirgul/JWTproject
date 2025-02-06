@@ -16,9 +16,11 @@ namespace AuthServer.Service.Services;
 public class TokenService : ITokenService
 {
     private readonly CustomTokenOption _customTokenOption;
+    private readonly UserManager<UserApp> _userManager;
 
-    public TokenService(IOptions<CustomTokenOption> options)
+    public TokenService(IOptions<CustomTokenOption> options, UserManager<UserApp> userManager)
     {
+        _userManager = userManager;
         _customTokenOption = options.Value;
     }
 
@@ -30,8 +32,10 @@ public class TokenService : ITokenService
         return Convert.ToBase64String(numberBytes);
     }
 
-    private IEnumerable<Claim> GetClaims(UserApp userApp, List<string> audiences)
+        // JWT payload içindeki bilgiler buradan toplanır.
+    private async Task<IEnumerable<Claim>> GetClaims(UserApp userApp, List<string> audiences)
     {
+        var userRoles = await _userManager.GetRolesAsync(userApp);
         var userClaimList = new List<Claim>()
         {
             new Claim(ClaimTypes.NameIdentifier, userApp.Id),
@@ -42,7 +46,10 @@ public class TokenService : ITokenService
         var value = audiences
             .Select(x => new Claim(JwtRegisteredClaimNames.Aud, x));
         // her bir audience değeri üzerinden geçilir ve her bir öğe için yeni bir Claim oluşturulur ve kullanıcın hedef kitlesi yeni claime atanır.
+
+        var roleValues = userRoles.Select(x => new Claim(ClaimTypes.Role, x));
         
+        userClaimList.AddRange(roleValues);
         userClaimList.AddRange(value);
         return userClaimList; 
     }
@@ -80,7 +87,7 @@ public class TokenService : ITokenService
             issuer: _customTokenOption.Issuer,
             expires: accessTokenExpiration,
             notBefore: DateTime.Now,
-            claims: GetClaims(userApp, _customTokenOption.Audience),
+            claims: GetClaims(userApp, _customTokenOption.Audience).Result,
             signingCredentials: signingCredentials);
 
         var handler = new JwtSecurityTokenHandler(); 
